@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Search, ShoppingCart, Star, Leaf, Camera, X, User } from "lucide-react"
+import { Search, ShoppingCart, Star, Leaf, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { ProductAnalysisModal } from "@/components/product-analysis-modal"
 
 // Mock product data
 const ecoProducts = [
@@ -81,7 +82,7 @@ const ecoProducts = [
 export default function AmazonGreenCart() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const [showKnowMore, setShowKnowMore] = useState(false)
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false)
   const [cartCount, setCartCount] = useState(0)
 
   const filteredProducts = ecoProducts.filter((product) =>
@@ -98,9 +99,9 @@ export default function AmazonGreenCart() {
     setCartCount((prev) => prev + 1)
   }
 
-  const openKnowMore = (product) => {
+  const openAnalysisModal = (product) => {
     setSelectedProduct(product)
-    setShowKnowMore(true)
+    setShowAnalysisModal(true)
   }
 
   return (
@@ -198,12 +199,12 @@ export default function AmazonGreenCart() {
                     Add to Cart
                   </Button>
                   <Button
-                    onClick={() => openKnowMore(product)}
+                    onClick={() => openAnalysisModal(product)}
                     variant="outline"
-                    className="w-full border-sky-400 text-sky-600 hover:bg-sky-50 py-2 text-sm"
+                    className="w-full border-purple-400 text-purple-600 hover:bg-purple-50 py-2 text-sm"
                   >
-                    <Camera className="w-4 h-4 mr-1" />
-                    Know More
+                    <Leaf className="w-4 h-4 mr-1" />
+                    Gemini Analysis
                   </Button>
                 </div>
               </CardContent>
@@ -212,83 +213,13 @@ export default function AmazonGreenCart() {
         </div>
       </div>
 
-      {/* Know More Modal */}
-      {showKnowMore && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-sm w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-4">
-              {/* Modal Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-black">Product Analysis</h2>
-                <Button onClick={() => setShowKnowMore(false)} variant="ghost" size="sm" className="p-1">
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {/* Product Image */}
-              <img
-                src={selectedProduct.image || "/placeholder.svg"}
-                alt={selectedProduct.name}
-                className="w-full h-48 object-cover rounded-md mb-4"
-              />
-
-              {/* Product Details */}
-              <h3 className="font-bold text-black mb-2">{selectedProduct.name}</h3>
-              <p className="text-gray-700 text-sm mb-4">{selectedProduct.description}</p>
-
-              {/* Eco Features */}
-              <div className="mb-4">
-                <h4 className="font-semibold text-black mb-2">Eco-Friendly Features:</h4>
-                <div className="space-y-1">
-                  {selectedProduct.ecoFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Leaf className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-gray-700">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Eco Rating */}
-              <div className="mb-4">
-                <h4 className="font-semibold text-black mb-2">Eco-Friendliness Rating:</h4>
-                <div className="flex items-center gap-2">
-                  <div className="flex">{renderStars(selectedProduct.ecoRating)}</div>
-                  <span className="text-sm text-gray-600">{selectedProduct.ecoRating}/5 stars</span>
-                </div>
-              </div>
-
-              {/* AI Analysis Placeholder */}
-              <div className="bg-sky-50 p-3 rounded-md mb-4">
-                <h4 className="font-semibold text-black mb-2 flex items-center gap-2">
-                  <Camera className="w-4 h-4" />
-                  AI Image Analysis
-                </h4>
-                <p className="text-sm text-gray-700">
-                  Connect your OpenAI API key to enable intelligent product component analysis and sustainability
-                  insights.
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-2">
-                <Button
-                  onClick={() => {
-                    addToCart(selectedProduct)
-                    setShowKnowMore(false)
-                  }}
-                  className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium"
-                >
-                  Add to Cart
-                </Button>
-                <Button onClick={() => setShowKnowMore(false)} variant="outline" className="w-full">
-                  Close
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Product Analysis Modal */}
+      <ProductAnalysisModal
+        product={selectedProduct}
+        isOpen={showAnalysisModal}
+        onClose={() => setShowAnalysisModal(false)}
+        onAddToCart={addToCart}
+      />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Leaf, Trophy, Gift, Coins, TrendingUp, Package, Star, Target } from "lucide-react"
+import { ArrowLeft, Leaf, Trophy, Gift, Coins, TrendingUp, Package, Star, Target, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -120,16 +120,23 @@ export default function UserDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-gradient-to-r from-sky-400 to-sky-500 px-4 py-4 shadow-md">
-        <div className="flex items-center gap-3">
-          <Link href="/">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-sky-600 p-2">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div className="flex items-center gap-2">
+              <Leaf className="text-white w-6 h-6" />
+              <h1 className="text-xl font-bold text-white">Eco Dashboard</h1>
+            </div>
+          </div>
+          <Link href="/settings">
             <Button variant="ghost" size="sm" className="text-white hover:bg-sky-600 p-2">
-              <ArrowLeft className="w-5 h-5" />
+              <Settings className="w-5 h-5" />
             </Button>
           </Link>
-          <div className="flex items-center gap-2">
-            <Leaf className="text-white w-6 h-6" />
-            <h1 className="text-xl font-bold text-white">Eco Dashboard</h1>
-          </div>
         </div>
       </header>
 
