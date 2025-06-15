@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Sparkles, X, Loader2, Leaf, Recycle, Star, Settings, Package } from "lucide-react"
+import { useState } from "react"
+import { Sparkles, X, Loader2, Leaf, Recycle, Star, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
 
 interface ProductAnalysisModalProps {
   product: any
@@ -17,22 +16,8 @@ export function ProductAnalysisModal({ product, isOpen, onClose, onAddToCart }: 
   const [analysis, setAnalysis] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [apiKey, setApiKey] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Get API key from localStorage when component mounts
-    if (typeof window !== "undefined") {
-      const storedApiKey = localStorage.getItem("gemini_api_key")
-      setApiKey(storedApiKey)
-    }
-  }, [isOpen])
 
   const analyzeProduct = async () => {
-    if (!apiKey) {
-      setError("Please configure your Gemini API key in settings first")
-      return
-    }
-
     setIsAnalyzing(true)
     setError(null)
 
@@ -45,7 +30,6 @@ export function ProductAnalysisModal({ product, isOpen, onClose, onAddToCart }: 
         body: JSON.stringify({
           imageUrl: product.image,
           productName: product.name,
-          apiKey: apiKey,
         }),
       })
 
@@ -74,15 +58,6 @@ export function ProductAnalysisModal({ product, isOpen, onClose, onAddToCart }: 
 
     // Clean up the text and split into sections
     const cleanText = text.replace(/\*\*/g, "").trim()
-
-    // Try to split by section headers
-    const sectionPatterns = [
-      /Components?\s*&?\s*Materials?/i,
-      /Eco-Friendly\s*Features?/i,
-      /Recycling\s*Instructions?/i,
-      /Environmental\s*Impact/i,
-      /Sustainability\s*Score/i,
-    ]
 
     const sections = []
 
@@ -308,21 +283,7 @@ export function ProductAnalysisModal({ product, isOpen, onClose, onAddToCart }: 
               Gemini AI Analysis
             </h4>
 
-            {!apiKey && (
-              <div className="text-center py-4">
-                <p className="text-sm text-gray-700 mb-3">
-                  Configure your Gemini API key to enable AI product analysis
-                </p>
-                <Link href="/settings">
-                  <Button className="bg-purple-500 hover:bg-purple-600 text-white" size="sm">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Configure API Key
-                  </Button>
-                </Link>
-              </div>
-            )}
-
-            {apiKey && !analysis && !isAnalyzing && !error && (
+            {!analysis && !isAnalyzing && !error && (
               <div>
                 <p className="text-sm text-gray-700 mb-3">
                   Get detailed component analysis and recycling instructions using Google Gemini AI.
@@ -352,14 +313,6 @@ export function ProductAnalysisModal({ product, isOpen, onClose, onAddToCart }: 
                   <Button onClick={analyzeProduct} variant="outline" size="sm">
                     Try Again
                   </Button>
-                  {error.includes("API key") && (
-                    <Link href="/settings">
-                      <Button size="sm" className="bg-purple-500 hover:bg-purple-600 text-white">
-                        <Settings className="w-4 h-4 mr-1" />
-                        Settings
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               </div>
             )}

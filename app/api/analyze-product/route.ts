@@ -3,10 +3,14 @@ import { GoogleGenerativeAI } from "@google/generative-ai"
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageUrl, productName, apiKey } = await request.json()
+    const { imageUrl, productName } = await request.json()
+
+    // Get API key from environment variable (server-side only)
+    const apiKey = process.env.GEMINI_API_KEY
 
     if (!apiKey) {
-      return NextResponse.json({ error: "Gemini API key not provided" }, { status: 400 })
+      console.error("GEMINI_API_KEY environment variable is not set")
+      return NextResponse.json({ error: "AI service is temporarily unavailable" }, { status: 500 })
     }
 
     // Initialize the Gemini AI client
@@ -32,7 +36,7 @@ export async function POST(request: NextRequest) {
           },
         }
 
-        const prompt = `Analyze this eco-friendly product "${productName}" and provide a detailed analysis. Format your response with clear sections:
+        const prompt = `Analyze this eco-friendly product "${productName}" and provide a detailed analysis with clear sections:
 
 Components & Materials:
 Provide detailed information about the materials used in this product. Include primary materials, secondary components, manufacturing materials, and any visible certifications or labels.
@@ -71,25 +75,25 @@ Please provide detailed, specific information for each section.`
     const analysis = response.text()
 
     if (!analysis) {
-      return NextResponse.json({ error: "No analysis received from Gemini" }, { status: 500 })
+      return NextResponse.json({ error: "No analysis received from AI service" }, { status: 500 })
     }
 
     return NextResponse.json({ analysis })
   } catch (error: any) {
     console.error("Error analyzing product:", error)
 
-    // Handle specific Gemini API errors
+    // Handle specific Gemini API errors without exposing details
     if (error.message?.includes("API key")) {
-      return NextResponse.json({ error: "Invalid Gemini API key" }, { status: 401 })
+      return NextResponse.json({ error: "AI service authentication failed" }, { status: 500 })
     }
 
     if (error.message?.includes("quota") || error.message?.includes("rate limit")) {
-      return NextResponse.json({ error: "API quota exceeded. Please try again later." }, { status: 429 })
+      return NextResponse.json({ error: "AI service is busy. Please try again later." }, { status: 429 })
     }
 
     return NextResponse.json(
       {
-        error: "Failed to analyze product. Please check your API key and try again.",
+        error: "AI analysis service is temporarily unavailable. Please try again later.",
       },
       { status: 500 },
     )
@@ -97,29 +101,42 @@ Please provide detailed, specific information for each section.`
 }
 
 async function generateTextOnlyAnalysis(model: any, productName: string) {
-  const prompt = `Analyze the eco-friendly product "${productName}" and provide detailed information. Format your response with clear sections:
+  const prompt = `Analyze the eco-friendly product "${productName}" and provide a detailed sustainability analysis with clear sections:
 
 Components & Materials:
-Based on the product name, provide detailed information about the likely materials and components used in this type of product. Include primary materials, secondary components, typical manufacturing materials, and common certifications.
+Based on the product name, list the likely materials and components:
+- Primary materials typically used for this product type
+- Common secondary components and hardware
+- Manufacturing materials and processes
+- Typical certifications for this product category
 
 Eco-Friendly Features:
-List and explain the sustainable aspects typically found in this product type including renewable materials, biodegradable components, recyclable parts, energy efficiency features, and sustainable manufacturing practices.
+Identify potential sustainable aspects of this product type:
+- Renewable materials commonly used
+- Biodegradable components typical for this product
+- Recyclable parts and materials
+- Energy efficiency features (if applicable)
+- Sustainable manufacturing practices
 
 Recycling Instructions:
-Provide specific step-by-step instructions for recycling and disposal of this product type:
-1. How to disassemble the product if needed
+Provide specific recycling and disposal instructions for this product type:
+1. Step-by-step disassembly process (if needed)
 2. Which components go in which recycling streams
 3. Special disposal requirements for any materials
 4. Local recycling options and recommendations
 5. Reuse and upcycling possibilities
 
 Environmental Impact:
-Explain the environmental benefits of this product type including carbon footprint reduction, resource conservation benefits, waste reduction impact, and long-term environmental advantages compared to conventional alternatives.
+Assess the environmental benefits of this product type:
+- Carbon footprint reduction compared to conventional alternatives
+- Resource conservation benefits
+- Waste reduction impact
+- Long-term environmental advantages
 
 Sustainability Score:
-Rate this product type from 1-5 stars based on typical eco-friendliness. Explain your rating considering common materials, manufacturing processes, and end-of-life disposal options.
+Rate this product type from 1-5 stars based on typical eco-friendliness, considering common materials, manufacturing processes, and end-of-life disposal options. Explain your rating.
 
-Please provide detailed, specific information for each section based on common characteristics of this product type.`
+Please be specific and detailed in each section based on common characteristics of this product type.`
 
   return await model.generateContent(prompt)
 }

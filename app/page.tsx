@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, ShoppingCart, Star, Leaf, User } from "lucide-react"
+import { Search, ShoppingCart, Star, Leaf, User, Users, Recycle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -153,6 +153,30 @@ export default function AmazonGreenCart() {
           <h1 className="text-xl font-bold text-black">Amazon GreenCart</h1>
         </div>
         <p className="text-gray-700 text-sm">Discover eco-friendly products for a sustainable lifestyle</p>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="px-4 py-4 bg-white border-b">
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/group-shopping">
+            <Card className="border-green-200 hover:bg-green-50 transition-colors">
+              <CardContent className="p-3 text-center">
+                <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-black text-sm">Group Shopping</h3>
+                <p className="text-xs text-gray-600">Save money & reduce carbon footprint</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/marketplace">
+            <Card className="border-blue-200 hover:bg-blue-50 transition-colors">
+              <CardContent className="p-3 text-center">
+                <Recycle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-black text-sm">EcoMarketplace</h3>
+                <p className="text-xs text-gray-600">Buy & sell pre-loved eco items</p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
       </div>
 
       {/* Product Grid */}
